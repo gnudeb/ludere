@@ -15,3 +15,17 @@ def resolve_constructor_parameter_types(cls: Type) -> List[Type]:
     types = [p.annotation for p in required_parameters]
 
     return types
+
+
+def resolve_function_parameter_types(f) -> List[Type]:
+    signature = inspect.signature(f)
+
+    parameters = dict(signature.parameters)
+    parameters.pop("args", None)
+    parameters.pop("kwargs", None)
+
+    required_parameters = [p for n, p in parameters.items() if p.default is inspect.Parameter.empty]
+    types = [p.annotation for p in required_parameters]
+
+    return types
+
