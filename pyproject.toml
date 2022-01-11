@@ -8,6 +8,7 @@ authors = ["Vlad Smirnov <gnudeb0@gmail.com>"]
 python = "^3.8"
 
 [tool.poetry.dev-dependencies]
+pytest = "^6.2.5"
 
 [build-system]
 requires = [
