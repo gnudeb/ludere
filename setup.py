@@ -4,16 +4,13 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="ludere",
-    version="0.0.1",
     author="Vlad Smirnov",
     author_email="gnudeb0@gmail.com",
-    description="Toy DI framework",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    # url="https://github.com/pypa/sampleproject",
+    url="https://github.com/gnudeb/ludere/",
     project_urls={
-        # "Bug Tracker": "https://github.com/pypa/sampleproject/issues",
+        "Bug Tracker": "https://github.com/gnudeb/ludere/issues",
     },
     classifiers=[
         "Programming Language :: Python :: 3",
