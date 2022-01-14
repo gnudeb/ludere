@@ -50,6 +50,9 @@ class Ludere:
         self.resolve()
         self._run_on_start_hooks()
 
+    def stop(self):
+        self._run_on_stop_hooks()
+
     def _is_resolved(self, cls: Type):
         return cls in self._resolved_beans.keys()
 
@@ -94,8 +97,16 @@ class Ludere:
             if isinstance(bean, LifecycleHooks):
                 Thread(target=bean.on_start).start()
 
+    def _run_on_stop_hooks(self):
+        for bean in self._resolved_beans.values():
+            if isinstance(bean, LifecycleHooks):
+                Thread(target=bean.on_stop).start()
+
 
 class LifecycleHooks:
 
     def on_start(self):
+        pass
+
+    def on_stop(self):
         pass

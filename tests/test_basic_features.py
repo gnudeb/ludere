@@ -130,7 +130,7 @@ def test_can_register_configuration_function():
     assert ludere.get_bean(ImportantObject).value == 500
 
 
-def test_bean_can_implement_on_start_lifecycle_method():
+def test_bean_can_implement_on_start_lifecycle_hook():
     ludere = Ludere()
 
     @ludere.register
@@ -144,3 +144,21 @@ def test_bean_can_implement_on_start_lifecycle_method():
     ludere.run()
 
     assert ludere.get_bean(Runner).state == "started"
+
+
+def test_bean_can_implement_on_stop_lifecycle_hook():
+    ludere = Ludere()
+
+    @ludere.register
+    @dataclass
+    class Runner(LifecycleHooks):
+        state: str = "running"
+
+        def on_stop(self):
+            self.state = "stopped"
+
+    ludere.run()
+    runner = ludere.get_bean(Runner)
+    assert runner.state == "running"
+    ludere.stop()
+    assert runner.state == "stopped"
