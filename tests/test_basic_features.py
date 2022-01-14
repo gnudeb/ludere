@@ -74,3 +74,38 @@ def test_can_inject_beans_into_provider():
     assert ludere.get_bean(Child) is not None
     assert ludere.get_bean(Parent) is not None
     assert type(ludere.get_bean(Parent).child) is Child
+
+
+def test_can_resolve_a_subclass():
+    ludere = Ludere()
+
+    class A:
+        pass
+
+    @ludere.register
+    class B(A):
+        pass
+
+    ludere.resolve()
+
+    assert type(ludere.get_bean(A)) == B
+    assert id(ludere.get_bean(A)) == id(ludere.get_bean(B))
+
+
+def test_two_classes_can_resolve_to_single_bean():
+    ludere = Ludere()
+
+    class A:
+        pass
+
+    class B:
+        pass
+
+    @ludere.register
+    class AB(A, B):
+        pass
+
+    ludere.resolve()
+
+    assert ludere.get_bean(A) is not None
+    assert id(ludere.get_bean(A)) == id(ludere.get_bean(B)) == id(ludere.get_bean(AB))

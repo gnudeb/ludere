@@ -28,7 +28,9 @@ class Ludere:
                 self._attempt_to_resolve_function(f)
 
     def get_bean(self, cls: Type[T]) -> Optional[T]:
-        return self._resolved_beans.get(cls)
+        for bean_cls, bean in self._resolved_beans.items():
+            if issubclass(bean_cls, cls):
+                return bean
 
     def _is_resolved(self, cls: Type):
         return cls in self._resolved_beans.keys()
