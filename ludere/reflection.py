@@ -29,3 +29,8 @@ def resolve_function_parameter_types(f) -> List[Type]:
 
     return types
 
+
+def has_return_type(f) -> bool:
+    signature = inspect.signature(f)
+
+    return signature.return_annotation != signature.empty

@@ -100,6 +100,17 @@ toml = "*"
 testing = ["argcomplete", "hypothesis (>=3.56)", "mock", "nose", "requests", "xmlschema"]
 
 [[package]]
+name = "pytest-timeout"
+version = "2.0.2"
+description = "pytest plugin to abort hanging tests"
+category = "dev"
+optional = false
+python-versions = ">=3.6"
+
+[package.dependencies]
+pytest = ">=5.0.0"
+
+[[package]]
 name = "toml"
 version = "0.10.2"
 description = "Python Library for Tom's Obvious, Minimal Language"
@@ -110,7 +121,7 @@ python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "8713efddd86ce4bf08884571ad2bc6862e9eca0a8bcfd8b62b70833597b670b6"
+content-hash = "443c31f81013ea097553511ad9d1f5a8b02724cc267432b61ee555c457005239"
 
 [metadata.files]
 atomicwrites = [
@@ -148,6 +159,10 @@ pyparsing = [
 pytest = [
     {file = "pytest-6.2.5-py3-none-any.whl", hash = "sha256:7310f8d27bc79ced999e760ca304d69f6ba6c6649c0b60fb0e04a4a77cacc134"},
     {file = "pytest-6.2.5.tar.gz", hash = "sha256:131b36680866a76e6781d13f101efb86cf674ebb9762eb70d3082b6f29889e89"},
+]
+pytest-timeout = [
+    {file = "pytest-timeout-2.0.2.tar.gz", hash = "sha256:e6f98b54dafde8d70e4088467ff621260b641eb64895c4195b6e5c8f45638112"},
+    {file = "pytest_timeout-2.0.2-py3-none-any.whl", hash = "sha256:fe9c3d5006c053bb9e062d60f641e6a76d6707aedb645350af9593e376fcc717"},
 ]
 toml = [
     {file = "toml-0.10.2-py2.py3-none-any.whl", hash = "sha256:806143ae5bfb6a3c6e736a764057db0e6a0e05e338b5630894a5f779cabb4f9b"},

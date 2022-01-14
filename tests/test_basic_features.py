@@ -109,3 +109,21 @@ def test_two_classes_can_resolve_to_single_bean():
 
     assert ludere.get_bean(A) is not None
     assert id(ludere.get_bean(A)) == id(ludere.get_bean(B)) == id(ludere.get_bean(AB))
+
+
+def test_can_register_configuration_function():
+    ludere = Ludere()
+
+    @ludere.register
+    @dataclass
+    class ImportantObject:
+        value: int = 5
+
+    @ludere.register_function
+    def configure_important_object(io: ImportantObject):
+        io.value = 500
+
+    ludere.resolve()
+    ludere.run_modifiers()
+
+    assert ludere.get_bean(ImportantObject).value == 500

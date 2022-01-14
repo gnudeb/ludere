@@ -1,6 +1,6 @@
 from typing import List, Type, Set, Any, Dict, Optional, TypeVar, Callable
 
-from ludere.reflection import resolve_constructor_parameter_types, resolve_function_parameter_types
+from ludere.reflection import resolve_constructor_parameter_types, resolve_function_parameter_types, has_return_type
 
 T = TypeVar("T")
 
@@ -9,7 +9,8 @@ class Ludere:
 
     def __init__(self):
         self._pending_classes: Set[Type] = set()
-        self._pending_functions: List[Callable] = []
+        self._pending_bean_providers: List[Callable] = []
+        self._pending_bean_modifiers: List[Callable] = []
         self._resolved_beans: Dict[Type, Any] = {}
 
     def register(self, cls):
@@ -17,15 +18,27 @@ class Ludere:
         return cls
 
     def register_function(self, f):
-        self._pending_functions.append(f)
+        if has_return_type(f):
+            self._pending_bean_providers.append(f)
+        else:
+            self._pending_bean_modifiers.append(f)
 
     def resolve(self):
-        while len(self._pending_classes) > 0 or len(self._pending_functions) > 0:
+        while len(self._pending_classes) > 0 or len(self._pending_bean_providers) > 0:
             for cls in list(self._pending_classes):
                 self._attempt_to_resolve_class(cls)
 
-            for f in list(self._pending_functions):
+            for f in list(self._pending_bean_providers):
                 self._attempt_to_resolve_function(f)
+
+    def run_modifiers(self):
+        for modifier in self._pending_bean_modifiers:
+            dependencies = resolve_function_parameter_types(modifier)
+
+            assert all(self._is_resolved(dep_cls) for dep_cls in dependencies)
+
+            arguments = [self.get_bean(dep_cls) for dep_cls in dependencies]
+            modifier(*arguments)
 
     def get_bean(self, cls: Type[T]) -> Optional[T]:
         for bean_cls, bean in self._resolved_beans.items():
@@ -60,7 +73,7 @@ class Ludere:
             return
 
         self._resolved_beans[type(instance)] = instance
-        self._pending_functions.remove(f)
+        self._pending_bean_providers.remove(f)
 
     def _attempt_to_instantiate_function(self, f):
         dependencies = resolve_function_parameter_types(f)
