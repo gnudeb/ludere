@@ -1,3 +1,4 @@
+from threading import Thread
 from typing import List, Type, Set, Any, Dict, Optional, TypeVar, Callable
 
 from ludere.reflection import resolve_constructor_parameter_types, resolve_function_parameter_types, has_return_type
@@ -45,6 +46,10 @@ class Ludere:
             if issubclass(bean_cls, cls):
                 return bean
 
+    def run(self):
+        self.resolve()
+        self._run_on_start_hooks()
+
     def _is_resolved(self, cls: Type):
         return cls in self._resolved_beans.keys()
 
@@ -83,3 +88,14 @@ class Ludere:
 
         arguments = [self.get_bean(dep_cls) for dep_cls in dependencies]
         return f(*arguments)
+
+    def _run_on_start_hooks(self):
+        for bean in self._resolved_beans.values():
+            if isinstance(bean, LifecycleHooks):
+                Thread(target=bean.on_start).start()
+
+
+class LifecycleHooks:
+
+    def on_start(self):
+        pass

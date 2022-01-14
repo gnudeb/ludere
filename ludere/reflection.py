@@ -1,6 +1,5 @@
 import inspect
-from dataclasses import dataclass, field
-from typing import Set, Type, List
+from typing import Type, List
 
 
 def resolve_constructor_parameter_types(cls: Type) -> List[Type]:

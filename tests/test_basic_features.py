@@ -1,6 +1,7 @@
 from dataclasses import dataclass
+from time import sleep
 
-from ludere.core import Ludere
+from ludere.core import Ludere, LifecycleHooks
 
 
 def test_can_create_new_ludere():
@@ -127,3 +128,19 @@ def test_can_register_configuration_function():
     ludere.run_modifiers()
 
     assert ludere.get_bean(ImportantObject).value == 500
+
+
+def test_bean_can_implement_on_start_lifecycle_method():
+    ludere = Ludere()
+
+    @ludere.register
+    @dataclass
+    class Runner(LifecycleHooks):
+        state: str = "not started"
+
+        def on_start(self):
+            self.state = "started"
+
+    ludere.run()
+
+    assert ludere.get_bean(Runner).state == "started"
