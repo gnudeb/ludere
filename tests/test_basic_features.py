@@ -124,8 +124,7 @@ def test_can_register_configuration_function():
     def configure_important_object(io: ImportantObject):
         io.value = 500
 
-    ludere.resolve()
-    ludere.run_modifiers()
+    ludere.run()
 
     assert ludere.get_bean(ImportantObject).value == 500
 

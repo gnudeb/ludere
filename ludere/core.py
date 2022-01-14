@@ -48,6 +48,7 @@ class Ludere:
 
     def run(self):
         self.resolve()
+        self.run_modifiers()
         self._run_on_start_hooks()
 
     def stop(self):
