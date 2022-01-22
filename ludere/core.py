@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from threading import Thread
 from typing import List, Type, Set, Any, Dict, Optional, TypeVar, Callable
 
@@ -26,11 +27,16 @@ class Ludere:
 
     def resolve(self):
         while len(self._pending_classes) > 0 or len(self._pending_bean_providers) > 0:
+            number_of_classes_resolved = 0
             for cls in list(self._pending_classes):
-                self._attempt_to_resolve_class(cls)
+                number_of_classes_resolved += self._attempt_to_resolve_class(cls)
 
+            number_of_functions_resolved = 0
             for f in list(self._pending_bean_providers):
-                self._attempt_to_resolve_function(f)
+                number_of_functions_resolved += self._attempt_to_resolve_function(f)
+
+            if number_of_classes_resolved + number_of_functions_resolved == 0:
+                raise ResolutionError
 
     def run_modifiers(self):
         for modifier in self._pending_bean_modifiers:
@@ -57,14 +63,16 @@ class Ludere:
     def _is_resolved(self, cls: Type):
         return cls in self._resolved_beans.keys()
 
-    def _attempt_to_resolve_class(self, cls: Type):
+    def _attempt_to_resolve_class(self, cls: Type) -> bool:
         instance = self._attempt_to_instantiate_class(cls)
 
         if instance is None:
-            return
+            return False
 
         self._resolved_beans[cls] = instance
         self._pending_classes.remove(cls)
+
+        return True
 
     def _attempt_to_instantiate_class(self, cls: Type[T]) -> Optional[T]:
         constructor_dependencies = resolve_constructor_parameter_types(cls)
@@ -75,14 +83,16 @@ class Ludere:
         constructor_arguments = [self.get_bean(dep_cls) for dep_cls in constructor_dependencies]
         return cls(*constructor_arguments)
 
-    def _attempt_to_resolve_function(self, f):
+    def _attempt_to_resolve_function(self, f) -> bool:
         instance = self._attempt_to_instantiate_function(f)
 
         if instance is None:
-            return
+            return False
 
         self._resolved_beans[type(instance)] = instance
         self._pending_bean_providers.remove(f)
+
+        return True
 
     def _attempt_to_instantiate_function(self, f):
         dependencies = resolve_function_parameter_types(f)
@@ -111,3 +121,7 @@ class LifecycleHooks:
 
     def on_stop(self):
         pass
+
+
+class ResolutionError(Exception):
+    pass

@@ -1,7 +1,8 @@
 from dataclasses import dataclass
-from time import sleep
 
-from ludere.core import Ludere, LifecycleHooks
+import pytest
+
+from ludere.core import Ludere, LifecycleHooks, ResolutionError
 
 
 def test_can_create_new_ludere():
@@ -161,3 +162,40 @@ def test_bean_can_implement_on_stop_lifecycle_hook():
     assert runner.state == "running"
     ludere.stop()
     assert runner.state == "stopped"
+
+
+def test_attempt_to_resolve_nonexistent_class_dependency_fails():
+    ludere = Ludere()
+
+    class Child:
+        pass
+
+    @ludere.register
+    @dataclass
+    class Parent:
+        child: Child
+
+    @ludere.register_function
+    def make_parent(child: Child) -> Parent:
+        return Parent(child)
+
+    with pytest.raises(ResolutionError):
+        ludere.resolve()
+
+
+def test_attempt_to_resolve_nonexistent_function_dependency_fails():
+    ludere = Ludere()
+
+    class Child:
+        pass
+
+    @dataclass
+    class Parent:
+        child: Child
+
+    @ludere.register_function
+    def make_parent(child: Child) -> Parent:
+        return Parent(child)
+
+    with pytest.raises(ResolutionError) as e:
+        ludere.resolve()
